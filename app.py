@@ -2,7 +2,7 @@
 
 from flask import Flask, request, render_template, redirect
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 
 app = Flask(__name__)
 
@@ -88,3 +88,60 @@ def delete_user(id):
 
     return redirect('/')
 
+
+# Post Routes 
+@app.route('/users/<int:id>/posts/new')
+def new_post_form(id):
+    user = User.query.get_or_404(id)
+
+    return render_template('/new_post.html', user=user)
+
+
+@app.route('/users/<int:id>/posts/new', methods=['POST'])
+def create_new_post(id):
+    title = request.form['post_title']
+    content = request.form['post_content']
+    user = request.form['user_id']
+
+    new_post = Post(post_title=title, post_content=content, user_id=user)
+    db.session.add(new_post)
+    db.session.commit()
+
+    return redirect(f'/posts/{new_post.id}')
+
+@app.route('/posts/<int:id>')
+def get_post(id):
+    post = Post.query.get_or_404(id)
+
+    return render_template('/post.html', post=post)
+
+
+@app.route('/posts/<int:id>/edit')
+def update_post_form(id):
+    post = Post.query.get_or_404(id)
+
+    return render_template('/post_edit.html', post=post)
+
+
+@app.route('/posts/<int:id>/edit', methods=['POST'])
+def update_post(id):
+    title = request.form['post_title']
+    content = request.form['post_content']
+
+    post = Post.query.get(id)
+    post.post_title = title
+    post.post_content = content
+
+    db.session.add(post)
+    db.session.commit()
+
+    return redirect(f'/posts/{post.id}')
+
+@app.route('/posts/<int:id>/delete')
+def delete_post(id):
+    post = Post.query.get(id)
+    user_id = post.user_id
+    Post.query.filter_by(id=id).delete()
+    db.session.commit()
+
+    return redirect(f'/users/{user_id}')

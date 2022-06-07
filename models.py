@@ -1,7 +1,7 @@
 """Models for Blogly."""
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
+from sqlalchemy import text, func
 
 
 db = SQLAlchemy()
@@ -36,3 +36,20 @@ class User(db.Model):
         db.Text(), 
         default=str('https://eastlakeohio.com/wp-content/uploads/2022/01/no-image-eastlake-300x300.jpg')
     )
+
+
+class Post(db.Model):
+
+    __tablename__ = 'posts'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    post_title = db.Column(db.String(50), default='No Title')
+
+    post_content = db.Column(db.Text, nullable=False)
+
+    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    post = db.relationship('User', backref='posts')

@@ -15,6 +15,17 @@
         <textarea type="text" name="post_content" class="form-control" id="post-content"></textarea>
       </div>
       <input type="hidden" name="user_id" value="{{user.id}}">
+      <div>
+        <fieldset>
+          <legend>Tags</legend>
+          {% for tag in tags: %}
+          <div>
+            <input type="checkbox" id="{{tag.id}}" value="{{tag.id}}" name="tags">
+            <label for="{{tag.id}}">{{tag.tag_name}}</label>
+          </div>
+          {% endfor %}
+        </fieldset>
+      </div>
       <button type="submit" class="btn btn-primary">Add</button>
       <a href="/users/{{user.id}}" class="btn btn-secondary">Cancel</a>
 </form>
